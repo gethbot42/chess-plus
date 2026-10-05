@@ -164,3 +164,19 @@ def test_nav_board_is_copy() -> None:
     p.back()
     assert p.moves == tuple(MOVES)
     assert p.fen == SAMPLE_FEN
+
+
+# --- US3: SAN ---
+
+SAMPLE_SAN = ("Kc7", "Ba5+", "b6", "Rxd1")
+
+
+def test_san_sample() -> None:
+    assert Puzzle.from_csv_row(SAMPLE_ROW).san_moves == SAMPLE_SAN
+
+
+def test_san_independent_of_step() -> None:
+    p = Puzzle.from_csv_row(SAMPLE_ROW)
+    for i in range(5):
+        p.go_to(i)
+        assert p.san_moves == SAMPLE_SAN

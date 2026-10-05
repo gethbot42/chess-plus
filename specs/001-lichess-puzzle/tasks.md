@@ -119,10 +119,10 @@ this, most tasks inside a story touch the same file and run in sequence.
 
 ### Implementation for User Story 2
 
-- [ ] T026 [US2] In `src/chess_plus/puzzle.py`, add private navigation state set at the end of construction: `self._board = chess.Board(fen)` (the step is `len(self._board.move_stack)`; no separate counter needed). Add typed, docstringed properties: `step -> int`, `board -> chess.Board` (returns `self._board.copy()`), `next_move -> chess.Move | None` (`moves[step]` if `step < N` else `None`), `previous_move -> chess.Move | None` (`moves[step-1]` if `step > 0` else `None`).
-- [ ] T027 [US2] In `src/chess_plus/puzzle.py`, implement `forward() -> bool` (push `next_move` if there is one, return whether a move was played) and `back() -> bool` (`self._board.pop()` if `step > 0`, return whether a move was undone). Both are typed and docstringed (FR-009, research R2).
-- [ ] T028 [US2] In `src/chess_plus/puzzle.py`, implement `go_to(step: int) -> None`: raise `ValueError(f"step: must be in 0..{N}, got {step}")` when outside `0..N`, otherwise call `back()`/`forward()` until it reaches the target. Add `go_to_start()`, `go_to_solver_start()` and `go_to_end()` as one-line wrappers for `go_to(0)`, `go_to(1)` and `go_to(N)`. All typed and docstringed (FR-010).
-- [ ] T029 [US2] Run `pytest tests/test_puzzle.py` (all green) and `mypy src` (clean).
+- [X] T026 [US2] In `src/chess_plus/puzzle.py`, add private navigation state set at the end of construction: `self._board = chess.Board(fen)` (the step is `len(self._board.move_stack)`; no separate counter needed). Add typed, docstringed properties: `step -> int`, `board -> chess.Board` (returns `self._board.copy()`), `next_move -> chess.Move | None` (`moves[step]` if `step < N` else `None`), `previous_move -> chess.Move | None` (`moves[step-1]` if `step > 0` else `None`).
+- [X] T027 [US2] In `src/chess_plus/puzzle.py`, implement `forward() -> bool` (push `next_move` if there is one, return whether a move was played) and `back() -> bool` (`self._board.pop()` if `step > 0`, return whether a move was undone). Both are typed and docstringed (FR-009, research R2).
+- [X] T028 [US2] In `src/chess_plus/puzzle.py`, implement `go_to(step: int) -> None`: raise `ValueError(f"step: must be in 0..{N}, got {step}")` when outside `0..N`, otherwise call `back()`/`forward()` until it reaches the target. Add `go_to_start()`, `go_to_solver_start()` and `go_to_end()` as one-line wrappers for `go_to(0)`, `go_to(1)` and `go_to(N)`. All typed and docstringed (FR-010).
+- [X] T029 [US2] Run `pytest tests/test_puzzle.py` (all green) and `mypy src` (clean).
 
 **Checkpoint**: User Stories 1 and 2 both work.
 
@@ -136,13 +136,13 @@ this, most tasks inside a story touch the same file and run in sequence.
 
 ### Tests for User Story 3 (write FIRST) ⚠️
 
-- [ ] T030 [US3] In `tests/test_puzzle.py`, add `test_san_sample`: `Puzzle.from_csv_row(SAMPLE_ROW).san_moves == ("Kc7", "Ba5+", "b6", "Rxd1")` (US3-1, SC-003).
-- [ ] T031 [US3] In `tests/test_puzzle.py`, add `test_san_independent_of_step`: for each `i` in `0..4`, `go_to(i)` leaves `san_moves == ("Kc7", "Ba5+", "b6", "Rxd1")` (US3-2, FR-011).
-- [ ] T032 [US3] Run `pytest tests/test_puzzle.py -k san`. Note: `san_moves` was already computed at load in T015/T016 (research R5), so these tests may pass right away. If they do, confirm they would catch a regression by temporarily breaking the SAN pass in `src/chess_plus/puzzle.py` (e.g. returning UCI strings), seeing them fail, and reverting.
+- [X] T030 [US3] In `tests/test_puzzle.py`, add `test_san_sample`: `Puzzle.from_csv_row(SAMPLE_ROW).san_moves == ("Kc7", "Ba5+", "b6", "Rxd1")` (US3-1, SC-003).
+- [X] T031 [US3] In `tests/test_puzzle.py`, add `test_san_independent_of_step`: for each `i` in `0..4`, `go_to(i)` leaves `san_moves == ("Kc7", "Ba5+", "b6", "Rxd1")` (US3-2, FR-011).
+- [X] T032 [US3] Run `pytest tests/test_puzzle.py -k san`. Note: `san_moves` was already computed at load in T015/T016 (research R5), so these tests may pass right away. If they do, confirm they would catch a regression by temporarily breaking the SAN pass in `src/chess_plus/puzzle.py` (e.g. returning UCI strings), seeing them fail, and reverting.
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Only if T030/T031 fail: fix the SAN pass in `Puzzle.from_dict` in `src/chess_plus/puzzle.py` so `board.san(move)` is computed before each `push` on a fresh `chess.Board(fen)`, stored as `tuple[str, ...]`. Then rerun `pytest` and `mypy src`.
+- [X] T033 [US3] (Not needed: T030/T031 passed.) Only if T030/T031 fail: fix the SAN pass in `Puzzle.from_dict` in `src/chess_plus/puzzle.py` so `board.san(move)` is computed before each `push` on a fresh `chess.Board(fen)`, stored as `tuple[str, ...]`. Then rerun `pytest` and `mypy src`.
 
 **Checkpoint**: All user stories work.
 
@@ -150,9 +150,9 @@ this, most tasks inside a story touch the same file and run in sequence.
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T034 [P] Create `CHANGELOG.md` at repo root with a `## 0.1.0 - 2026-10-03` entry: "Added `Puzzle`: load a Lichess puzzle CSV row, step through its moves, and get them in SAN." (Constitution IV).
-- [ ] T035 [P] Check that every public member of `Puzzle` in `src/chess_plus/puzzle.py` has type hints and a docstring, and that `chess_plus.__all__ == ["Puzzle"]` (Constitution IV).
-- [ ] T036 Run the quickstart.md validation: `pytest` and `mypy src` both pass, and the 4-line manual check in `specs/001-lichess-puzzle/quickstart.md` prints `('Kc7', 'Ba5+', 'b6', 'Rxd1')` followed by 4 FENs (SC-004).
+- [X] T034 [P] Create `CHANGELOG.md` at repo root with a `## 0.1.0 - 2026-10-03` entry: "Added `Puzzle`: load a Lichess puzzle CSV row, step through its moves, and get them in SAN." (Constitution IV).
+- [X] T035 [P] Check that every public member of `Puzzle` in `src/chess_plus/puzzle.py` has type hints and a docstring, and that `chess_plus.__all__ == ["Puzzle"]` (Constitution IV).
+- [X] T036 Run the quickstart.md validation: `pytest` and `mypy src` both pass, and the 4-line manual check in `specs/001-lichess-puzzle/quickstart.md` prints `('Kc7', 'Ba5+', 'b6', 'Rxd1')` followed by 4 FENs (SC-004).
 
 ---
 

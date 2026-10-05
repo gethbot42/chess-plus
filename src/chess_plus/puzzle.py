@@ -28,7 +28,7 @@ class Puzzle:
     __slots__ = (
         "_puzzle_id", "_fen", "_moves", "_rating", "_rating_deviation", "_popularity",
         "_nb_plays", "_themes", "_game_url", "_opening_tags", "_daily_date",
-        "_solver_color", "_san_moves",
+        "_solver_color", "_san_moves", "_board",
     )
 
     _puzzle_id: str
@@ -44,6 +44,7 @@ class Puzzle:
     _daily_date: datetime.date | None
     _solver_color: chess.Color
     _san_moves: tuple[str, ...]
+    _board: chess.Board
 
     @classmethod
     def from_csv_row(cls, line: str) -> Puzzle:
@@ -119,6 +120,7 @@ class Puzzle:
         self._daily_date = daily_date
         self._solver_color = solver_color
         self._san_moves = tuple(san_moves)
+        self._board = chess.Board(fen)
         return self
 
     @property
@@ -185,3 +187,59 @@ class Puzzle:
     def san_moves(self) -> tuple[str, ...]:
         """All moves in SAN, played from `fen`."""
         return self._san_moves
+
+    @property
+    def step(self) -> int:
+        """Number of moves played so far, 0..len(moves)."""
+        return len(self._board.move_stack)
+
+    @property
+    def board(self) -> chess.Board:
+        """Copy of the position at the current step."""
+        return self._board.copy()
+
+    @property
+    def next_move(self) -> chess.Move | None:
+        """Move `forward()` would play, or None at the end."""
+        return self._moves[self.step] if self.step < len(self._moves) else None
+
+    @property
+    def previous_move(self) -> chess.Move | None:
+        """Move `back()` would undo, or None at the start."""
+        return self._moves[self.step - 1] if self.step > 0 else None
+
+    def forward(self) -> bool:
+        """Play the next move. Return False (no change) if already at the end."""
+        move = self.next_move
+        if move is None:
+            return False
+        self._board.push(move)
+        return True
+
+    def back(self) -> bool:
+        """Undo the last move. Return False (no change) if already at the start."""
+        if self.step == 0:
+            return False
+        self._board.pop()
+        return True
+
+    def go_to(self, step: int) -> None:
+        """Jump to `step`. Raises ValueError if outside 0..len(moves)."""
+        if not 0 <= step <= len(self._moves):
+            raise ValueError(f"step: must be in 0..{len(self._moves)}, got {step}")
+        while self.step > step:
+            self.back()
+        while self.step < step:
+            self.forward()
+
+    def go_to_start(self) -> None:
+        """Jump to the starting position (step 0)."""
+        self.go_to(0)
+
+    def go_to_solver_start(self) -> None:
+        """Jump to the solver's first turn (step 1, after the setup move)."""
+        self.go_to(1)
+
+    def go_to_end(self) -> None:
+        """Jump past the last move."""
+        self.go_to(len(self._moves))
