@@ -109,13 +109,13 @@ this, most tasks inside a story touch the same file and run in sequence.
 
 ### Tests for User Story 2 (write FIRST, confirm they FAIL) ⚠️
 
-- [ ] T019 [US2] In `tests/test_puzzle.py`, add `test_nav_initial_state`: a newly loaded sample puzzle has `step == 0`, `board.fen() == SAMPLE_FEN`, `previous_move is None`, and `next_move == chess.Move.from_uci("b8c7")` (US2-1, FR-008, FR-012).
-- [ ] T020 [US2] In `tests/test_puzzle.py`, add `test_nav_forward_once`: `forward()` returns `True`, `step == 1`, `board.turn == chess.WHITE`, and `board.fen()` equals the FEN of `chess.Board(SAMPLE_FEN)` after pushing `b8c7`. `previous_move == b8c7` and `next_move == e1a5` (US2-2, FR-012).
-- [ ] T021 [US2] In `tests/test_puzzle.py`, add `test_nav_round_trip`: call `forward()` 4 times (each returns `True`), then `back()` 4 times (each returns `True`). Afterward `board.fen() == SAMPLE_FEN` exactly, including side to move, castling, en passant and counters (US2-3, SC-002).
-- [ ] T022 [US2] In `tests/test_puzzle.py`, add `test_nav_bounds`: at step 0, `back()` returns `False` and the FEN is unchanged. After `go_to_end()`, `forward()` returns `False`, the FEN is unchanged, and `next_move is None` (US2-4, US2-5, FR-009, FR-012).
-- [ ] T023 [US2] In `tests/test_puzzle.py`, add `test_nav_go_to_matches_stepping`: for each `i` in `0..4`, `go_to(i)` (starting from any prior step, e.g. after `go_to_end()`) gives the same `board.fen()` and `step` as calling `forward()` `i` times on a fresh puzzle. `go_to_start()`, `go_to_solver_start()` and `go_to_end()` match `go_to(0)`, `go_to(1)` and `go_to(4)`. `go_to(-1)` and `go_to(5)` raise `ValueError` (US2-6, FR-010).
-- [ ] T024 [US2] In `tests/test_puzzle.py`, add `test_nav_board_is_copy`: pushing a move onto the board returned by `puzzle.board` does not change `puzzle.board.fen()` or `puzzle.step`. Navigating never changes `puzzle.moves` or `puzzle.fen` (Edge Cases, research R3).
-- [ ] T025 [US2] Run `pytest tests/test_puzzle.py -k nav` and confirm that T019–T024 FAIL.
+- [X] T019 [US2] In `tests/test_puzzle.py`, add `test_nav_initial_state`: a newly loaded sample puzzle has `step == 0`, `board.fen() == SAMPLE_FEN`, `previous_move is None`, and `next_move == chess.Move.from_uci("b8c7")` (US2-1, FR-008, FR-012).
+- [X] T020 [US2] In `tests/test_puzzle.py`, add `test_nav_forward_once`: `forward()` returns `True`, `step == 1`, `board.turn == chess.WHITE`, and `board.fen()` equals the FEN of `chess.Board(SAMPLE_FEN)` after pushing `b8c7`. `previous_move == b8c7` and `next_move == e1a5` (US2-2, FR-012).
+- [X] T021 [US2] In `tests/test_puzzle.py`, add `test_nav_round_trip`: call `forward()` 4 times (each returns `True`), then `back()` 4 times (each returns `True`). Afterward `board.fen() == SAMPLE_FEN` exactly, including side to move, castling, en passant and counters (US2-3, SC-002).
+- [X] T022 [US2] In `tests/test_puzzle.py`, add `test_nav_bounds`: at step 0, `back()` returns `False` and the FEN is unchanged. After `go_to_end()`, `forward()` returns `False`, the FEN is unchanged, and `next_move is None` (US2-4, US2-5, FR-009, FR-012).
+- [X] T023 [US2] In `tests/test_puzzle.py`, add `test_nav_go_to_matches_stepping`: for each `i` in `0..4`, `go_to(i)` (starting from any prior step, e.g. after `go_to_end()`) gives the same `board.fen()` and `step` as calling `forward()` `i` times on a fresh puzzle. `go_to_start()`, `go_to_solver_start()` and `go_to_end()` match `go_to(0)`, `go_to(1)` and `go_to(4)`. `go_to(-1)` and `go_to(5)` raise `ValueError` (US2-6, FR-010).
+- [X] T024 [US2] In `tests/test_puzzle.py`, add `test_nav_board_is_copy`: pushing a move onto the board returned by `puzzle.board` does not change `puzzle.board.fen()` or `puzzle.step`. Navigating never changes `puzzle.moves` or `puzzle.fen` (Edge Cases, research R3).
+- [X] T025 [US2] Run `pytest tests/test_puzzle.py -k nav` and confirm that T019–T024 FAIL.
 
 ### Implementation for User Story 2
 

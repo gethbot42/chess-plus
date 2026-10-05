@@ -90,3 +90,77 @@ def test_load_invalid_rows(row: str, field_name: str) -> None:
 
 def test_load_negative_popularity() -> None:
     assert Puzzle.from_csv_row(row_with(Popularity="-42")).popularity == -42
+
+
+# --- US2: navigation ---
+
+MOVES = [chess.Move.from_uci(m) for m in ["b8c7", "e1a5", "b7b6", "f1d1"]]
+
+
+def test_nav_initial_state() -> None:
+    p = Puzzle.from_csv_row(SAMPLE_ROW)
+    assert p.step == 0
+    assert p.board.fen() == SAMPLE_FEN
+    assert p.previous_move is None
+    assert p.next_move == MOVES[0]
+
+
+def test_nav_forward_once() -> None:
+    p = Puzzle.from_csv_row(SAMPLE_ROW)
+    expected = chess.Board(SAMPLE_FEN)
+    expected.push(MOVES[0])
+    assert p.forward() is True
+    assert p.step == 1
+    assert p.board.turn == chess.WHITE
+    assert p.board.fen() == expected.fen()
+    assert p.previous_move == MOVES[0]
+    assert p.next_move == MOVES[1]
+
+
+def test_nav_round_trip() -> None:
+    p = Puzzle.from_csv_row(SAMPLE_ROW)
+    assert all(p.forward() for _ in range(4))
+    assert all(p.back() for _ in range(4))
+    assert p.board.fen() == SAMPLE_FEN
+
+
+def test_nav_bounds() -> None:
+    p = Puzzle.from_csv_row(SAMPLE_ROW)
+    assert p.back() is False
+    assert p.board.fen() == SAMPLE_FEN
+    p.go_to_end()
+    end_fen = p.board.fen()
+    assert p.forward() is False
+    assert p.board.fen() == end_fen
+    assert p.next_move is None
+
+
+def test_nav_go_to_matches_stepping() -> None:
+    def stepped(i: int) -> Puzzle:
+        q = Puzzle.from_csv_row(SAMPLE_ROW)
+        for _ in range(i):
+            q.forward()
+        return q
+
+    p = Puzzle.from_csv_row(SAMPLE_ROW)
+    for i in range(5):
+        p.go_to_end()
+        p.go_to(i)
+        assert (p.step, p.board.fen()) == (i, stepped(i).board.fen())
+    for jump, i in ((p.go_to_start, 0), (p.go_to_solver_start, 1), (p.go_to_end, 4)):
+        jump()
+        assert (p.step, p.board.fen()) == (i, stepped(i).board.fen())
+    for bad in (-1, 5):
+        with pytest.raises(ValueError, match="step"):
+            p.go_to(bad)
+
+
+def test_nav_board_is_copy() -> None:
+    p = Puzzle.from_csv_row(SAMPLE_ROW)
+    p.board.push(MOVES[0])
+    assert p.board.fen() == SAMPLE_FEN
+    assert p.step == 0
+    p.go_to_end()
+    p.back()
+    assert p.moves == tuple(MOVES)
+    assert p.fen == SAMPLE_FEN
